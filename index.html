@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>哈哈</title>
+
+    <style>
+
+        html,body{
+            padding: 0;
+            margin: 0;
+        }
+        #maintenanceMessage {
+            display: none; /* 默认隐藏 */
+            font-size: 24px;
+                       position: fixed;
+            inset: 20%;
+           text-align: center;
+        }
+        #myIframe {
+            position: fixed;
+            inset: 0;
+        }
+    </style>
+        <script>
+        // 检查当前协议
+        if (window.location.protocol === "http:") {
+            window.location.replace(window.location.href.replace("http:", "https:"));
+       
+
+        }
+    </script>
+</head>
+<body>
+
+    <div id="maintenanceMessage">服务器崩溃了，等我修复</div>
+    <script>
+
+        const maintenanceMessage = document.getElementById('maintenanceMessage');
+
+
+async function request(url, options = {}, timeout = 3000) {
+    // 默认配置
+    const defaultOptions = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        // 是否允许跨域携带凭证
+        credentials: 'same-origin'
+    };
+
+    // 合并默认配置和用户配置
+    const mergedOptions = {
+        ...defaultOptions,
+        ...options
+    };
+
+    // 创建AbortController
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+
+    try {
+        // 发起请求
+        const response = await fetch(url, {
+            ...mergedOptions,
+            signal: controller.signal
+        });
+
+        // 清除超时定时器
+        clearTimeout(id);
+
+        // 检查响应状态
+        if (!response.ok) {
+            throw new Error(`HTTP错误！状态码：${response.status}`);
+        }
+
+        // 根据Content-Type自动解析
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return await response.json();
+        } else if (contentType && contentType.includes('text')) {
+            return await response.text();
+        } else {
+            return response;
+        }
+
+    } catch (error) {
+        // 清除超时定时器
+        clearTimeout(id);
+
+        // 详细错误处理
+        if (error.name === 'AbortError') {
+            console.error(`请求超时：${url}`);
+            throw new Error('请求超时，请检查网络连接');
+        } else if (error instanceof TypeError) {
+            console.error(`网络错误：${error.message}`);
+            throw new Error('网络连接失败');
+        } else {
+            console.error(`请求错误：${error.message}`);
+            throw error;
+        }
+    }
+}
+        // 快捷方法：GET请求
+function get(url, options = {}) {
+    return request(url, { method: 'GET', ...options });
+}
+        async function x() {
+            try {
+                await get('https://g.hzr0.com:99/gpt/');
+ 
+
+                window.location.replace( "http://gpt.hzr0.com:98");
+
+  
+            } catch (error) {
+                maintenanceMessage.style.display = 'block';
+                iframe.style.display = 'none'; // 隐藏iframe
+            }
+        }
+x()
+    </script>
+</body>
+</html>
